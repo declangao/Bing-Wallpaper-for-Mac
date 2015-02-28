@@ -25,8 +25,5 @@ python bing.py -d
 
 Use ```-h``` or ```--help``` to display help message.
 
-Note:
-[Requests](http://docs.python-requests.org/en/latest/) was used to simplfy the process. Make sure you have it installed before running the script.
-
 ## License
 Who cares... Do whatever you want with it.

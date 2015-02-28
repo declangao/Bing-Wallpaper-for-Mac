@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
-# Configurations
+import urllib, urllib2, json, sys
+from os.path import join, expanduser, isfile, exists
+from os import makedirs
 
+
+# Configurations
 # Location to save downloaded wallpapers
 # Leave the IMAGE_DIR empty to use default directory /Users/USERNAME/Pictures/BingWallpaper
 # Or you can set your own custom directory
@@ -9,11 +13,6 @@ IMAGE_DIR = ''
 # ISO country code
 # eg. 'en-US', 'en-NZ', 'zh-CN' or just leave it
 COUNTRY_CODE = ''
-
-
-import requests, urllib, sys
-from os.path import join, expanduser, isfile, exists
-from os import makedirs
 
 
 # Apple Script to set wallpaper
@@ -64,7 +63,7 @@ def set_wallpaper(file_path):
 # Display help message
 def print_help_message():
     msg = '''
-Bing Wallpaper for Mac version 1.1
+Bing Wallpaper for Mac version 1.2
 By Declan Gao  http://declangao.me
 
 Bing Wallpaper for Mac can batch download and set Bing image of the day as wallpaper on OS X.
@@ -109,13 +108,13 @@ def main():
     if '' != COUNTRY_CODE.strip():
         url += '&mkt=' + COUNTRY_CODE
 
-    # Make the request
-    response = requests.get(url)
-    if response.status_code == 200:
-        json = response.json() # Get JSON
+    try:
+        # Make the request
+        response = urllib2.urlopen(url)
+        json_data = json.load(response) # Get JSON
 
-        if 'images' in json:
-            images = json['images']
+        if 'images' in json_data:
+            images = json_data['images']
         else:
             sys.exit('JSON error. Please try again later...')
         
@@ -127,8 +126,11 @@ def main():
                 download_image(url, True)
             else:
                 download_image(url)
-    else:
-        print('Cannot reach server. Please check your internet connection...')
+
+    except urllib2.HTTPError, e:
+        print('Error ' + str(e.code) + '. Please try again later...')
+    except urllib2.URLError, e:
+        print('Error. Please check your internet connection...')
 
 
 if __name__ == '__main__':
